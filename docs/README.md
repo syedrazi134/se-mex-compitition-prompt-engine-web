@@ -13,6 +13,7 @@ Read in this order before any change. Anyone joining the team, and any AI assist
 | 7 | [design.md](design.md) | Architecture, components, API table, threat model | Designing a module or endpoint |
 | 8 | [testing.md](testing.md) | Test strategy, commands, edge cases, results | Writing tests; Safe Close |
 | 9 | [ai-usage-log.md](ai-usage-log.md) | AI use log required by the event rules | After any meaningful AI-assisted change |
+| 10 | [judge-checks.md](judge-checks.md) | Reviewer checklist: clone, install, verify, health, smoke, API docs | Reviewing or demoing the project |
 | — | [architecture/](architecture/) | Module diagrams (added later) | As needed |
 
 Precedence when docs disagree: the Phase 1 plan overrides the context doc on stack choices; DECISIONS.md overrides both for anything logged after them.

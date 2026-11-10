@@ -2,6 +2,24 @@
 
 Newest first. Never undo a decision here without adding a new entry that replaces it. Format: date, decision, reason, alternatives rejected.
 
+## Open items (not decided)
+
+### O-1. Linking anonymous mobile users to accounts
+- **Context:** mobile users today are anonymous (random install ID, free daily prompts on the Cloudflare Worker). Phase 1 adds accounts.
+- **Open:** whether and how an install ID's history is linked to an account on sign-up (guest-to-account linking). Not built in Sprint 1.
+
+## 2026-11-10 — Smoke reports the mode of every dependency; CI requires real services
+- **Decision:** `npm run smoke` prints each dependency with its mode: `real`, `in-memory` (real mongod binary, throwaway data) or `stub` (in-process Redis protocol stub). A stubbed dependency is reported as `stub`, never `ok`. `SMOKE_REQUIRE_REAL=1` fails smoke unless every dependency is real; CI sets it and runs MongoDB (replica set via `docker run`) and Redis (service container) for real. `/api/v1/health` is unchanged and only ever reports real connection status; stubs never enter a production code path.
+- **Reason:** the first local smoke reported "redis ok" while talking to a stub, which overstated what was checked.
+- **Alternatives rejected:** dropping the local fallback (smoke would be unusable without Docker); a test-mode flag in the API (puts stub logic into production code).
+- **Amends:** "Smoke uses real services when configured, in-memory otherwise" (below).
+
+## 2026-11-10 — Node.js 24 LTS replaces Node.js 22
+- **Decision:** target Node.js 24 LTS everywhere: `.nvmrc` = 24, `engines.node` `>=24.0.0` in every `package.json`, CI on 24, `@types/node` 24.
+- **Reason:** Node 24 is the current LTS and is what the development machine runs, so local checks and CI use the same runtime.
+- **Alternatives rejected:** staying on Node 22 (dev and CI would differ).
+- **Replaces:** "Runtime: Node.js 22 LTS, TypeScript strict" (below); the TypeScript strict part still stands.
+
 ## 2026-11-10 — Dependencies added only with the code that needs them
 - **Decision:** the setup adds no BullMQ, Sentry, `sharp`, `migrate-mongo` or AWS SDK yet. `worker.ts` connects MongoDB and Redis and registers no queues. Each dependency lands with its first user (BullMQ with the first queue, `migrate-mongo` with the first model). Exact versions are pinned, picked from releases at least two weeks old.
 - **Reason:** setup rule "add only the dependencies this setup needs"; knip fails on unused dependencies.
