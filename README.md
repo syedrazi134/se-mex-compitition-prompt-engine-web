@@ -60,6 +60,26 @@ npm run dev:web           # Next.js web app on http://localhost:3001
 ```
 
 API docs: `/api/v1/docs`. Health: `/api/v1/health`.
+
+#### Without Docker
+
+```sh
+npm run build
+npm run start:local       # built API with the repo-root .env
+```
+
+`start:local` reads `.env`. If `MONGODB_URI` is unset, it starts an in-memory MongoDB replica set, and the data is lost on exit. If `REDIS_URL` is unset, it starts a labelled Redis protocol stub that answers health checks only. Both substitutes are announced in the terminal. `npm start` in `apps/api` also reads `../../.env`, but it needs real `MONGODB_URI` and `REDIS_URL` values.
+
+The API needs MongoDB as a replica set, because orders and the ledger use transactions. Health reports `mongodb: down` on a standalone server. To convert a local MongoDB Windows service, run this in an **administrator** PowerShell:
+
+```powershell
+$cfg = "C:\Program Files\MongoDB\Server\9.0\bin\mongod.cfg"
+(Get-Content $cfg) -replace '^#replication:', "replication:`n  replSetName: rs0" | Set-Content $cfg
+Restart-Service MongoDB
+mongosh --quiet --eval "rs.initiate({_id:'rs0',members:[{_id:0,host:'127.0.0.1:27017'}]})"
+```
+
+Then set `MONGODB_URI=mongodb://127.0.0.1:27017/prompt_engine?replicaSet=rs0` in `.env`.
 The web app reads `apps/web/.env.local`; copy `apps/web/.env.example` there. Each slice has its own live switch (`NEXT_PUBLIC_LIVE_AUTH`, `_MARKETPLACE`, `_CREATOR`, `_CHECKOUT`, `_GENERATION`); all default to `false`, which shows labelled sample data. Set a switch to `true` once its backend endpoints exist, and allow `http://localhost:3001` in the API's CORS origins.
 
 ### Run tests

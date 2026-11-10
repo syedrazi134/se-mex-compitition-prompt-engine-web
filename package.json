@@ -17,6 +17,7 @@
   "scripts": {
     "dev": "npm run build:packages && npm run dev -w @prompt-engine/api",
     "dev:web": "npm run dev -w @prompt-engine/web",
+    "start:local": "node scripts/start-local.mjs",
     "build:packages": "tsc -b packages/shared-types/tsconfig.build.json packages/ai-adapters/tsconfig.build.json packages/payment-adapters/tsconfig.build.json packages/oauth-providers/tsconfig.build.json",
     "build": "npm run build:packages && tsc -p apps/api/tsconfig.build.json && npm run build -w @prompt-engine/web",
     "typecheck": "npm run build:packages && tsc -p packages/shared-types --noEmit && tsc -p packages/ai-adapters --noEmit && tsc -p packages/payment-adapters --noEmit && tsc -p packages/oauth-providers --noEmit && tsc -p apps/api --noEmit && npm run typecheck -w @prompt-engine/web",

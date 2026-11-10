@@ -2,6 +2,25 @@
 
 Newest first. Entry format: date, summary, files/modules touched, verify result, follow-ups.
 
+## 2026-11-10 — Fix: API would not start locally (no .env, no Redis, standalone MongoDB)
+
+- **Summary:** `npm start` in `apps/api` failed with `Invalid environment` because `MONGODB_URI`, `REDIS_URL` and `JWT_ACCESS_SECRET` were all undefined. There were three causes:
+  - No `.env` existed, and `start` never loaded one.
+  - No Redis is installed (no Docker, and WSL has no distro).
+  - The local MongoDB 9 Windows service runs standalone. Health requires a replica set, so it reported mongodb `down`.
+
+  Fixes:
+  - `start` now loads `../../.env`.
+  - New `npm run start:local` fills only the missing services, using the smoke test's in-memory replica set and Redis stub, and announces each substitute.
+  - A local `.env` (gitignored) with a generated JWT secret.
+  - README steps to convert the MongoDB service to replica set `rs0`.
+- **Files touched:** `scripts/start-local.mjs` (new), `package.json`, `apps/api/package.json`, `README.md`, `docs/DECISIONS.md`, this history. `.env` was created locally and is not committed.
+- **Decisions:** "Local start without Docker".
+- **Verify result:** `npm run start:local` → `GET /api/v1/health` 200 with api, mongodb (in-memory replica set) and redis (stub) all `ok`; `/api/v1/docs` 200. `npm start` now gets past the missing-variable error until it reaches the Redis check, as expected without `REDIS_URL`.
+- **Follow-ups:**
+  - Convert the local MongoDB service to `rs0`, using the README steps (needs admin).
+  - Get a real Redis (Upstash free tier, or Memurai) before Step 5.
+
 ## 2026-11-10 — Demo Step 0: clean baseline, per-feature live flags, contract decisions
 
 - **Summary:** Step 0 of the Demo Readiness Plan.

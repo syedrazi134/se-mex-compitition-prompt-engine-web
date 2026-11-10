@@ -2,6 +2,12 @@
 
 Newest first. Never undo a decision here without adding a new entry that replaces it. Format: date, decision, reason, alternatives rejected.
 
+## 2026-11-10 — Local start without Docker
+- **Decision:** `npm run start:local` (`scripts/start-local.mjs`) runs the built API with the repo-root `.env`. For each of `MONGODB_URI` and `REDIS_URL` that is unset, it substitutes the in-memory MongoDB replica set or the Redis protocol stub that smoke already uses, and prints a warning naming each substitute. `npm start` in `apps/api` loads `../../.env` when the file exists, and hosts still set variables directly.
+- **Reason:** the dev machine has no Docker and no Redis, and its MongoDB service runs standalone. Without this, the API could not start locally at all.
+- **Limits:** the stub only answers PING and INFO. A real `REDIS_URL` is required before BullMQ lands (Step 5), and production and CI never use substitutes.
+- **Alternatives rejected:** a fallback inside the API (would risk a stub reaching production); requiring Docker or WSL (neither available on the dev machine).
+
 ## 2026-11-10 — Demo scope: real code on the demo path, sandboxed money and external accounts
 - **Decision:** Every step of the scripted demo path (sign up → browse/search → listing → checkout → library → generate → creator onboarding and listing → admin approve → creator dashboard) runs against the live API and database. Payments use `FakePaymentAdapter` behind a simulated hosted checkout labelled Test mode. Generation uses one real image provider behind `AiAdapter`, with `FakeAiAdapter` as fallback. Media goes through a `StorageAdapter`. The admin surface is listing approve and reject only. Payout requests return "Coming soon". The prompt core (editor, playground, versions, tests) and social posting are not on the demo path. Every feature is either fully live or visibly marked "Coming soon"; no half-wired screens.
 - **Reason:** The committee judges a working end-to-end product. Sandboxing only the money and external accounts keeps the demo safe and repeatable without faking the core flows.
