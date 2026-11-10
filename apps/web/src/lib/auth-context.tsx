@@ -1,7 +1,8 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { isDemoMode, setAccessToken, signIn, signOut, signUp } from './api';
+import { setAccessToken, signIn, signOut, signUp } from './api';
+import { isLive } from './features';
 import type { AuthUser } from './types';
 
 interface AuthContextValue {
@@ -28,7 +29,7 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
   }, []);
 
   useEffect(() => {
-    if (isDemoMode()) {
+    if (!isLive('auth')) {
       setLoading(false);
       return;
     }

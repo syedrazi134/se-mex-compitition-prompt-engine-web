@@ -6,7 +6,8 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Icon } from '@/components/icon';
 import { ListingCard, formatPrice } from '@/components/listing-card';
-import { getCreatorStorefront, isDemoMode } from '@/lib/api';
+import { getCreatorStorefront } from '@/lib/api';
+import { isLive } from '@/lib/features';
 import type { CreatorStorefrontData } from '@/lib/types';
 
 type StoreTab = 'Prompts' | 'Bundles' | 'Subscription' | 'Reviews';
@@ -50,7 +51,7 @@ export default function CreatorStorefrontPage() {
   };
 
   const follow = () => {
-    if (!isDemoMode()) {
+    if (isLive('marketplace')) {
       setMessage('Following will be available when the social follow API is connected.');
       return;
     }

@@ -3,6 +3,8 @@
 Nov 10, 2026 · @Syed Razi
 
 > Exported from the Claude Doc "Prompt Engine — Phase 1 Backend Plan" (https://claude.ai/artifact/Ctgm5ehHJC9pSoJQPafKL7) on 2026-11-10. The doc is the source of truth; re-export when it changes. The sprint-plan diagram did not survive export; see "Sprint plan" for a text version.
+>
+> **Local amendments (2026-11-10, Demo Readiness Plan):** this copy has been changed to match the frontend contract decisions C-1 to C-9 and the demo scope in [DECISIONS.md](DECISIONS.md). Changes: `/search` dropped in favour of `GET /listings?q=`, `GET /creators/featured` added, reviews embedded in the listing response and also paginated, a sandbox hosted-checkout page added, storage adapters added, and a demo-ordered build sequence. Copy these amendments back into the Claude Doc.
 
 ## Summary
 
@@ -37,7 +39,7 @@ One Node.js process type serves the API; a second runs background workers from t
 | API docs | OpenAPI 3.1 via `zod-to-openapi`, served with Swagger UI | Contract web and mobile build against |
 | Auth | JWT access (15 min) + rotating refresh tokens; Passport or direct OAuth for Google, Apple, Facebook | Doc requirement |
 | Queue and cache | Redis + BullMQ | Generation, payouts, emails, webhooks |
-| Media storage | S3-compatible bucket + CDN (CloudFront or Cloudflare R2) | Samples and outputs; signed upload URLs |
+| Media storage | `StorageAdapter` in `packages/storage-adapters`: local disk in dev (served at `/media/*`), S3-compatible (S3 or Cloudflare R2) in deploy, picked by `STORAGE_DRIVER` | Samples and outputs; signed upload URLs later |
 | Image processing | `sharp` in a worker | Resize on upload |
 | Logging and errors | Pino logs, Sentry | Request ids across API and workers |
 | Testing | Jest or Vitest, Supertest, `mongodb-memory-server` (replica-set mode) | Real transactions in tests |
@@ -64,7 +66,7 @@ apps/
       modules/
         auth/  users/  workspaces/  wallet/
         prompts/  tests/  public-api/
-        creators/  listings/  bundles/  search/
+        creators/  listings/  bundles/
         orders/  entitlements/  ledger/  payouts/  reviews/
         generation/  admin/  notifications/  media/
   web/                    Next.js web app (Phase 2)
@@ -73,6 +75,7 @@ packages/
   shared-types/           Zod schemas + inferred types for web and mobile
   ai-adapters/            One adapter per AI provider
   payment-adapters/       One adapter per payment gateway
+  storage-adapters/       Local disk (dev) and S3-compatible (deploy) media storage
   social-adapters/        Phase 3
 docs/
 ```
@@ -137,7 +140,7 @@ Money is the riskiest part of a MongoDB build, so every balance change runs insi
 Checkout flow:
 
 1. `POST /checkout` validates the cart, prices it server-side, and creates an `orders` document with status `pending` and a client-supplied `Idempotency-Key`.
-2. The payment adapter creates a hosted checkout session; the client is redirected. No card data touches our servers.
+2. The payment adapter creates a hosted checkout session; the client is redirected. No card data touches our servers. For the demo, `FakePaymentAdapter` serves a sandbox hosted page at `/sandbox/checkout/:sessionId`, labelled TEST MODE, with Approve and Decline buttons. It calls the webhook with a signature, just as a real gateway would.
 3. The gateway calls our webhook. We verify its signature, look up the order by `gatewayRef`, and ignore repeats.
 4. In **one transaction**: mark the order `paid`, insert `entitlements`, write the balanced ledger entries, and add an audit log entry.
 5. A queued job sends receipts and notifies the creator.
@@ -168,7 +171,7 @@ All Phase 1 groups from the context doc ship under `/api/v1`; Social is Phase 3 
 | Prompts | /prompts, /prompts/:id/versions, /prompts/:id/diff, /prompts/:id/rollback | Owner or workspace role | 2 |
 | Tests | /test-sets, POST /test-sets/:id/run | Owner or workspace role | 2 |
 | Prompt API (public) | POST /run/:promptId | Workspace API key + rate limit | 2 |
-| Marketplace browse | GET /listings, /listings/:id, /creators/:handle, /search | Public | 3 |
+| Marketplace browse | GET /listings (search via `q` and filters; no `/search`), /listings/:id (embeds latest 3 reviews and `ratingBreakdown`), /listings/:id/reviews, /creators/:handle, /creators/featured | Public | 3 |
 | Creator tools | /creator/profile, /creator/listings, /creator/bundles, /creator/stats | Creator role | 3 |
 | Orders and payments | POST /checkout, GET /orders, GET /entitlements, POST /webhooks/payments/:gateway | Buyer; webhook signature | 4 |
 | Payouts | GET /creator/balance, POST /creator/payouts | Creator role | 4 |
@@ -179,7 +182,8 @@ All Phase 1 groups from the context doc ship under `/api/v1`; Social is Phase 3 
 Conventions for every endpoint:
 
 - Errors use one shape: `{ error: { code, message, details } }` with correct HTTP status.
-- Lists use cursor pagination (`?cursor=&limit=`), not page numbers.
+- Successful responses are bare objects; lists are `{ items, nextCursor }` with cursor pagination (`?cursor=&limit=`), not page numbers.
+- Money is integer USD cents; PKR appears only as server-computed `displayPrices.PKR` (rate from `PKR_PER_USD`).
 - Writes that cost money (`/checkout`, `/creator/payouts`, `/wallet/top-up`, `/generations`) require an `Idempotency-Key` header.
 - Generation status reaches clients through polling and server-sent events; outside apps get webhooks.
 
@@ -241,6 +245,8 @@ Text version of the sprint diagram (reconstructed from the API table's sprint co
 | 5 | 9–10 | Generation framework + first AI tools, load test, **API contract frozen** gate |
 
 Money flows sit in sprint 4 so the payment gateway decision has eight weeks to land; until then checkout builds against the fake adapter.
+
+**Demo build order (supersedes the sprint order for the event):** Step 0 baseline and decisions → Step 1 auth, users, workspaces and wallet (100 free credits) → Step 2 seed data and storage adapters → Step 3 marketplace, creator tools, reviews and minimal admin approve or reject → Step 4 checkout, orders, entitlements and ledger → Step 5 generation with one real image provider → Step 6 Playwright e2e of the demo path and polish → Step 7 deploy to staging. Sprint 2 (prompts, versions, tests and the public Prompt API) moves after the event.
 
 ## Testing, DevOps and conventions
 

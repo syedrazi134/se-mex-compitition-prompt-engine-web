@@ -6,6 +6,7 @@ import {
   demoListings,
   demoListingDetail,
 } from './demo-data';
+import { isLive } from './features';
 import type {
   AuthSession,
   CreatorDashboardData,
@@ -32,9 +33,6 @@ export class ApiError extends Error {
   }
 }
 
-export function isDemoMode(): boolean {
-  return process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
-}
 
 export function setAccessToken(token: string | null): void {
   accessToken = token;
@@ -132,7 +130,7 @@ export async function getListings(
   } = {},
 ): Promise<{ items: ListingCardData[]; total: number }> {
   const { query = '', category = 'all', sort = 'Trending', limit = 24 } = options;
-  if (isDemoMode()) return demoListingPage(query, category, sort, limit);
+  if (!isLive('marketplace')) return demoListingPage(query, category, sort, limit);
 
   const params = new URLSearchParams({ limit: String(limit) });
   if (query.trim()) params.set('q', query.trim());
@@ -161,12 +159,12 @@ export async function getListings(
 }
 
 export async function getFeaturedCreators(): Promise<CreatorStorefrontData['creator'][]> {
-  if (isDemoMode()) return demoCreators;
+  if (!isLive('marketplace')) return demoCreators;
   return extractItems(await request<unknown>('/creators/featured'), 'featured creators');
 }
 
 export async function getCreatorStorefront(handle: string): Promise<CreatorStorefrontData> {
-  if (isDemoMode()) {
+  if (!isLive('marketplace')) {
     const creator = demoCreators.find((item) => item.handle === handle);
     if (!creator)
       throw new ApiError('This sample creator shop is not available.', 404, 'NOT_FOUND');
@@ -200,12 +198,12 @@ function demoDetailFor(id: string): ListingDetailData {
 }
 
 export async function getListing(id: string): Promise<ListingDetailData> {
-  if (isDemoMode()) return demoDetailFor(id);
+  if (!isLive('marketplace')) return demoDetailFor(id);
   return request<ListingDetailData>(`/listings/${encodeURIComponent(id)}`);
 }
 
 export async function getLibrary(): Promise<LibraryItem[]> {
-  if (isDemoMode()) return demoLibrary;
+  if (!isLive('checkout')) return demoLibrary;
   return extractItems(await request<unknown>('/entitlements'), 'library');
 }
 
@@ -215,9 +213,9 @@ export async function startGeneration(input: {
   variables: Record<string, string>;
   settings: Record<string, unknown>;
 }): Promise<{ id: string; status: string }> {
-  if (isDemoMode()) {
+  if (!isLive('generation')) {
     throw new ApiError(
-      'Generation is unavailable in design preview mode.',
+      'Generation is unavailable in preview mode.',
       501,
       'PREVIEW_UNAVAILABLE',
     );
@@ -229,7 +227,7 @@ export async function startGeneration(input: {
 }
 
 export async function getCreatorDashboard(): Promise<CreatorDashboardData> {
-  if (isDemoMode()) return demoDashboard;
+  if (!isLive('creator')) return demoDashboard;
   return request<CreatorDashboardData>('/creator/stats');
 }
 
@@ -239,9 +237,9 @@ export async function createCreatorProfile(input: {
   bio: string;
   agreementAccepted: true;
 }): Promise<{ handle: string; status: string }> {
-  if (isDemoMode()) {
+  if (!isLive('creator')) {
     throw new ApiError(
-      'Creator profiles are not submitted in design preview mode.',
+      'Creator profiles are not submitted in preview mode.',
       501,
       'PREVIEW_UNAVAILABLE',
     );
@@ -261,9 +259,9 @@ export async function createListing(input: {
   tools: string[];
   tags: string[];
 }): Promise<{ id: string; title: string }> {
-  if (isDemoMode()) {
+  if (!isLive('creator')) {
     throw new ApiError(
-      'Listings are not saved in design preview mode.',
+      'Listings are not saved in preview mode.',
       501,
       'PREVIEW_UNAVAILABLE',
     );
@@ -289,7 +287,7 @@ export async function startCheckout(
   paymentMethod: string,
   promoCode?: string,
 ): Promise<{ checkoutUrl: string }> {
-  if (isDemoMode()) {
+  if (!isLive('checkout')) {
     return { checkoutUrl: `${window.location.origin}/checkout?status=demo` };
   }
 
@@ -316,9 +314,9 @@ async function submitAuth(
     name?: string;
   },
 ): Promise<AuthSession> {
-  if (isDemoMode()) {
+  if (!isLive('auth')) {
     throw new ApiError(
-      'Account sign-in is unavailable in design preview mode.',
+      'Account sign-in is unavailable in preview mode.',
       501,
       'PREVIEW_UNAVAILABLE',
     );
@@ -343,7 +341,7 @@ export async function signUp(email: string, password: string, name: string): Pro
 }
 
 export async function signOut(): Promise<void> {
-  if (isDemoMode()) {
+  if (!isLive('auth')) {
     setAccessToken(null);
     return;
   }

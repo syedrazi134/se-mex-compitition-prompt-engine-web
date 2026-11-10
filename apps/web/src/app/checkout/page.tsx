@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 import { Icon } from '@/components/icon';
 import { formatPrice } from '@/components/listing-card';
 import { useAuth } from '@/lib/auth-context';
-import { isDemoMode, startCheckout } from '@/lib/api';
+import { startCheckout } from '@/lib/api';
+import { isLive } from '@/lib/features';
 import { readCart, writeCart, type CartItem } from '@/lib/cart';
 
 const usdToPkr = (minor: number) => Math.round((minor / 100) * 280).toLocaleString();
@@ -51,7 +52,7 @@ export default function CheckoutPage() {
   };
 
   const continueCheckout = async () => {
-    if (!user && !isDemoMode()) {
+    if (!user && isLive('checkout')) {
       window.location.href = '/sign-in?next=%2Fcheckout';
       return;
     }
@@ -119,7 +120,7 @@ export default function CheckoutPage() {
                 ['local-card', 'Debit or credit card', 'Pakistani Visa, Mastercard, UnionPay'],
                 ['international', 'International card', 'Charged in USD by your bank'],
               ].map(([value, name, detail]) => <label className={`payment-option ${paymentMethod === value ? 'selected' : ''}`} key={value}><input checked={paymentMethod === value} name="payment" onChange={() => setPaymentMethod(value ?? '')} type="radio" value={value} /><span><strong>{name}</strong><span>{detail}</span></span></label>)}
-                {!user && !authLoading && !isDemoMode() && <p className="muted-note">Sign in is required before a live order can be created. Your cart will be kept for you.</p>}
+                {!user && !authLoading && isLive('checkout') && <p className="muted-note">Sign in is required before a live order can be created. Your cart will be kept for you.</p>}
             </section>
           </div>
           <aside className="summary-card">
@@ -132,7 +133,7 @@ export default function CheckoutPage() {
             <div className="summary-row total"><span>Total</span><strong>{formatPrice(total)}</strong></div>
             <p className="summary-pkr">≈ Rs {usdToPkr(total)}</p>
             {error && <p className="form-error" role="alert">{error}</p>}
-            <button className="button button-wide" disabled={loading} onClick={() => void continueCheckout()} type="button">{loading ? <><span className="spinner" /> Preparing checkout…</> : user || isDemoMode() ? 'Continue to secure payment' : 'Sign in to continue'}</button>
+            <button className="button button-wide" disabled={loading} onClick={() => void continueCheckout()} type="button">{loading ? <><span className="spinner" /> Preparing checkout…</> : user || !isLive('checkout') ? 'Continue to secure payment' : 'Sign in to continue'}</button>
             <p className="trust-note"><Icon name="shield" size={15} />We never see or store your card or wallet details. Payments are handled on the provider’s secure page.</p>
             <p className="summary-disclaimer">Final pricing and any discount are validated by the server before payment.</p>
             <p className="trust-note"><Icon name="check" size={15} />Prompts are delivered to your Library once payment is confirmed.</p>

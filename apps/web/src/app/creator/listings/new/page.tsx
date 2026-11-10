@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Icon } from '@/components/icon';
-import { createListing, isDemoMode } from '@/lib/api';
+import { createListing } from '@/lib/api';
+import { isLive } from '@/lib/features';
 import { useAuth } from '@/lib/auth-context';
 
 export default function NewListingPage() {
@@ -47,14 +48,14 @@ export default function NewListingPage() {
     }
   };
 
-  if (!loading && !user && !isDemoMode()) {
+  if (!loading && !user && isLive('creator')) {
     return <div className="empty-state"><span className="state-icon"><Icon name="user" size={22} /></span><h2>Sign in to create a listing</h2><p>Your creator workspace is available after you sign in.</p><Link className="button button-small" href="/sign-in?next=%2Fcreator%2Flistings%2Fnew">Sign in</Link></div>;
   }
 
   return (
     <>
       <div className="page-header"><div><p className="eyebrow">Creator studio</p><h1>Create a listing</h1><p>Give buyers a clear preview while keeping the full prompt protected.</p></div><Link className="text-link" href="/creator/dashboard">← Dashboard</Link></div>
-      {isDemoMode() && <p className="preview-notice"><Icon name="sparkle" size={16} />You’re in design preview. Form submission is connected to the expected API contract, but demo mode does not save listings.</p>}
+      {!isLive('creator') && <p className="preview-notice"><Icon name="sparkle" size={16} />You’re in design preview. Form submission is connected to the expected API contract, but listings are not saved until creator tools are live.</p>}
       <form className="listing-form-layout" onSubmit={(event) => void submit(event)}>
         <div>
           <section className="listing-form-card">
