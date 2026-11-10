@@ -28,7 +28,7 @@ npm run verify:quick  # typecheck -> lint -> tests related to changed files
 npm run health        # audit, outdated, unused/missing deps, lockfile in sync
 ```
 
-Local MongoDB (replica set), Redis and MinIO: `docker compose up -d`. Without them, tests use an in-memory MongoDB replica set, and `smoke` uses that plus an in-process Redis protocol stub (PING/INFO only) and prints a warning. CI runs smoke against a real Redis service container.
+Local MongoDB (replica set), Redis and MinIO: `docker compose up -d`. Without them, tests use an in-memory MongoDB replica set, and `smoke` uses that plus an in-process Redis protocol stub (PING/INFO only) and reports each dependency with its mode (`real`, `in-memory` or `stub`; a stub is never shown as `ok`). CI runs smoke against real MongoDB and Redis with `SMOKE_REQUIRE_REAL=1`.
 
 ## Results summary
 
