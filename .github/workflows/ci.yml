@@ -1,19 +1,44 @@
-# Stack-agnostic CI. Create scripts/test.sh that installs dependencies and runs your tests.
+# Runs the full verify gate (scripts/test.sh -> npm run verify) on every push and pull request.
+# Redis is a real service container. MongoDB is the in-memory replica set started by the tests
+# and by smoke, because service containers can't pass the --replSet flag mongod needs.
 name: CI
 
 on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  test:
+  verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      redis:
+        image: redis:7.4.12-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      REDIS_URL: redis://localhost:6379
+      SCARF_ANALYTICS: 'false'
     steps:
       - uses: actions/checkout@v4
-      - name: Run tests
-        run: |
-          if [ ! -f scripts/test.sh ]; then
-            echo "scripts/test.sh not found. Create it to run your tests."
-            exit 1
-          fi
-          bash scripts/test.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Cache MongoDB binaries
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-binaries-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Verify
+        run: bash scripts/test.sh
+      - name: Dependency health
+        run: npm run health

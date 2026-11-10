@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/knip@6.43.0/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["scripts/*.mjs", ".claude/hooks/*.mjs"]
+    },
+    "apps/api": {
+      "entry": [
+        "src/worker.ts",
+        "src/middleware/*.ts",
+        "src/lib/*.ts",
+        "src/**/*.test.ts",
+        "test/**/*.ts"
+      ],
+      "project": ["src/**/*.ts", "test/**/*.ts"]
+    },
+    "packages/*": {
+      "entry": ["src/index.ts", "src/**/*.test.ts"],
+      "project": ["src/**/*.ts"]
+    }
+  }
+}

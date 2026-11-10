@@ -1,0 +1,19 @@
+{
+  "name": "@prompt-engine/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zod schemas and inferred types shared by the API, web and mobile clients",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "zod": "4.6.7"
+  }
+}

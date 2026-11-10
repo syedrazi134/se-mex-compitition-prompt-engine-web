@@ -1,0 +1,16 @@
+{
+  "name": "@prompt-engine/payment-adapters",
+  "version": "0.1.0",
+  "private": true,
+  "description": "One adapter per payment gateway behind the PaymentAdapter interface",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ]
+}
