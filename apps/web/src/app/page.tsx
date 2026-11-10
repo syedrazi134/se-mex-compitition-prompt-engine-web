@@ -7,7 +7,8 @@ import { useCallback, useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Icon } from '@/components/icon';
 import { ListingCard } from '@/components/listing-card';
-import { getFeaturedCreators, getListings, isDemoMode } from '@/lib/api';
+import { getFeaturedCreators, getListings } from '@/lib/api';
+import { isLive } from '@/lib/features';
 import type { CreatorSummary, ListingCardData } from '@/lib/types';
 
 const categoryData = [
@@ -59,7 +60,7 @@ export default function HomePage() {
 
   return (
     <div className="home-page">
-      {isDemoMode() && <div className="demo-ribbon">Design preview · sample content</div>}
+      {!isLive('marketplace') && <div className="demo-ribbon">Design preview · sample content</div>}
       <section className="hero">
         <div className="hero-copy">
           <p className="eyebrow"><Icon name="sparkle" size={14} /> 12,400 prompts from 1,900 creators</p>

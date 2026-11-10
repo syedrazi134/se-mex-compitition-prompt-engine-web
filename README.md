@@ -60,7 +60,7 @@ npm run dev:web           # Next.js web app on http://localhost:3001
 ```
 
 API docs: `/api/v1/docs`. Health: `/api/v1/health`.
-The web app reads `apps/web/.env.local`; copy `apps/web/.env.example` there. Preview mode is enabled by default in that example. Set `NEXT_PUBLIC_DEMO_MODE=false` to use the API, and allow `http://localhost:3001` in the API's CORS origins.
+The web app reads `apps/web/.env.local`; copy `apps/web/.env.example` there. Each slice has its own live switch (`NEXT_PUBLIC_LIVE_AUTH`, `_MARKETPLACE`, `_CREATOR`, `_CHECKOUT`, `_GENERATION`); all default to `false`, which shows labelled sample data. Set a switch to `true` once its backend endpoints exist, and allow `http://localhost:3001` in the API's CORS origins.
 
 ### Run tests
 

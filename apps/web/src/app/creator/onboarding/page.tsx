@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Icon } from '@/components/icon';
-import { createCreatorProfile, isDemoMode } from '@/lib/api';
+import { createCreatorProfile } from '@/lib/api';
+import { isLive } from '@/lib/features';
 import { useAuth } from '@/lib/auth-context';
 
 const steps = ['Profile', 'Shop', 'Payouts', 'Review'];
@@ -46,7 +47,7 @@ export default function CreatorOnboardingPage() {
     setBusy(true);
     setError('');
     try {
-      if (isDemoMode()) {
+      if (!isLive('creator')) {
         setComplete(true);
         return;
       }
@@ -65,7 +66,7 @@ export default function CreatorOnboardingPage() {
   };
 
   if (authLoading) return <div className="page-loading"><span className="spinner" /> Loading account…</div>;
-  if (!user && !isDemoMode()) {
+  if (!user && isLive('creator')) {
     return <div className="empty-state"><span className="state-icon"><Icon name="user" size={22} /></span><h2>Sign in to start your creator shop</h2><p>Your creator profile is linked to your Prompt Engine account.</p><Link className="button button-small" href="/sign-in?next=%2Fcreator%2Fonboarding">Sign in</Link></div>;
   }
 
@@ -73,11 +74,11 @@ export default function CreatorOnboardingPage() {
     return (
       <section className="onboarding-complete">
         <span className="state-icon"><Icon name="sparkle" size={23} /></span>
-        <p className="eyebrow">{isDemoMode() ? 'Preview complete' : 'Profile submitted'}</p>
-        <h1>{isDemoMode() ? 'Your shop is ready to preview.' : 'Welcome to the creator community.'}</h1>
-        <p>{isDemoMode() ? 'Nothing was submitted. Turn off demo mode and connect the creator profile API to create your live shop.' : 'Your creator profile has been received. You can start preparing your first listing while it is reviewed.'}</p>
+        <p className="eyebrow">{!isLive('creator') ? 'Preview complete' : 'Profile submitted'}</p>
+        <h1>{!isLive('creator') ? 'Your shop is ready to preview.' : 'Welcome to the creator community.'}</h1>
+        <p>{!isLive('creator') ? 'Nothing was submitted. Creator profiles are saved once creator tools are live.' : 'Your creator profile has been received. You can start preparing your first listing while it is reviewed.'}</p>
         <div className="onboarding-complete-actions">
-          <Link className="button button-outline button-small" href={isDemoMode() ? '/creators/lensbyayesha' : `/creators/${handle}`}>{isDemoMode() ? 'Browse sample shop' : 'Preview creator shop'}</Link>
+          <Link className="button button-outline button-small" href={!isLive('creator') ? '/creators/lensbyayesha' : `/creators/${handle}`}>{!isLive('creator') ? 'Browse sample shop' : 'Preview creator shop'}</Link>
           <Link className="button button-small" href="/creator/listings/new">Create a listing <Icon name="arrow" size={14} /></Link>
         </div>
       </section>
@@ -128,7 +129,7 @@ export default function CreatorOnboardingPage() {
         {error && <p className="form-error" role="alert">{error}</p>}
         <div className="onboarding-controls">
           {step > 0 ? <button className="button button-outline button-small" onClick={() => { setError(''); setStep((current) => current - 1); }} type="button"><Icon className="icon-reverse" name="arrow" size={14} />Back</button> : <span />}
-          {step < steps.length - 1 ? <button className="button button-small" onClick={next} type="button">Continue <Icon name="arrow" size={14} /></button> : <button className="button button-small" disabled={busy} onClick={() => void submit()} type="button">{busy ? 'Saving…' : isDemoMode() ? 'Preview shop' : 'Create my shop'}<Icon name="arrow" size={14} /></button>}
+          {step < steps.length - 1 ? <button className="button button-small" onClick={next} type="button">Continue <Icon name="arrow" size={14} /></button> : <button className="button button-small" disabled={busy} onClick={() => void submit()} type="button">{busy ? 'Saving…' : !isLive('creator') ? 'Preview shop' : 'Create my shop'}<Icon name="arrow" size={14} /></button>}
         </div>
       </section>
       <p className="onboarding-footnote"><Icon name="shield" size={14} />Your shop profile is public. Payment and identity information are never collected on this page.</p>

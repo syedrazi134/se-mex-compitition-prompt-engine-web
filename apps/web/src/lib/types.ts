@@ -25,7 +25,7 @@ export interface ListingCardData {
   category: ListingCategory;
   coverImage: string;
   priceMinor: number;
-  currency: 'USD' | 'PKR';
+  currency: 'USD';
   rating: number;
   reviewCount: number;
   creator: CreatorSummary;
@@ -50,12 +50,6 @@ export interface ListingDetailData extends ListingCardData {
     date: string;
     verifiedBuyer: boolean;
   }>;
-}
-
-export interface ListingPage {
-  items: ListingCardData[];
-  nextCursor: string | null;
-  total?: number;
 }
 
 export interface LibraryItem {

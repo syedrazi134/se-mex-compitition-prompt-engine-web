@@ -27,9 +27,7 @@
     "health": "node scripts/health.mjs",
     "smoke": "node scripts/smoke.mjs",
     "verify": "node scripts/verify.mjs",
-    "verify:quick": "node scripts/verify-quick.mjs",
-    "db:indexes": "node apps/api/dist/scripts/sync-indexes.js",
-    "purge:workspaces": "node apps/api/dist/scripts/purge-workspaces.js"
+    "verify:quick": "node scripts/verify-quick.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

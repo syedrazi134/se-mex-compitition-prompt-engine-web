@@ -2,6 +2,28 @@
 
 Newest first. Never undo a decision here without adding a new entry that replaces it. Format: date, decision, reason, alternatives rejected.
 
+## 2026-11-10 — Demo scope: real code on the demo path, sandboxed money and external accounts
+- **Decision:** Every step of the scripted demo path (sign up → browse/search → listing → checkout → library → generate → creator onboarding and listing → admin approve → creator dashboard) runs against the live API and database. Payments use `FakePaymentAdapter` behind a simulated hosted checkout labelled Test mode. Generation uses one real image provider behind `AiAdapter`, with `FakeAiAdapter` as fallback. Media goes through a `StorageAdapter`. The admin surface is listing approve and reject only. Payout requests return "Coming soon". The prompt core (editor, playground, versions, tests) and social posting are not on the demo path. Every feature is either fully live or visibly marked "Coming soon"; no half-wired screens.
+- **Reason:** The committee judges a working end-to-end product. Sandboxing only the money and external accounts keeps the demo safe and repeatable without faking the core flows.
+- **Alternatives rejected:** A fixture-backed UI demo (not "fully functional"); a real payment gateway before the event (gateway still undecided, onboarding takes too long).
+
+## 2026-11-10 — Per-feature live flags replace NEXT_PUBLIC_DEMO_MODE
+- **Decision:** The web app has one switch per slice: `NEXT_PUBLIC_LIVE_AUTH`, `NEXT_PUBLIC_LIVE_MARKETPLACE`, `NEXT_PUBLIC_LIVE_CREATOR`, `NEXT_PUBLIC_LIVE_CHECKOUT` (also covers the library, which reads `/entitlements`) and `NEXT_PUBLIC_LIVE_GENERATION`. Each defaults to `false`, which shows labelled sample data or a non-submitting preview. `apps/web/src/lib/features.ts` reads them by literal name, because Next.js only inlines `NEXT_PUBLIC_*` variables that way.
+- **Reason:** Backend slices land one at a time. A single global switch made it all-or-nothing, so a finished slice could not go live until every other slice was done.
+- **Alternatives rejected:** Keep `NEXT_PUBLIC_DEMO_MODE`; fall back to fixtures automatically when the API fails (hides real errors).
+
+## 2026-11-10 — Frontend–backend contract decisions (C-1 to C-9)
+Settled before the backend slices are built. The finished frontend is kept as-is wherever possible. [frontend-api-contract.md](frontend-api-contract.md) and [02-phase1-backend-plan.md](02-phase1-backend-plan.md) are updated to match.
+- **C-1 Search:** `GET /listings?q=&category=&tool=&minPrice=&maxPrice=&rating=&licence=&sort=&cursor=&limit=` is the only search endpoint. `/search` is dropped from the plan. *Rejected:* a separate `/search` route, which would duplicate the listing query and DTO.
+- **C-2 Reviews:** `GET /listings/:id` embeds the latest 3 reviews and a `ratingBreakdown`. `GET /listings/:id/reviews` paginates the rest with `{ items, nextCursor }`. *Rejected:* only inline (unbounded payload); only separate (extra round trip on the most visited page).
+- **C-3 Checkout idempotency:** the web app creates one `Idempotency-Key` when a checkout attempt starts, keeps it in component state and `sessionStorage`, and reuses it on every retry until the attempt succeeds or is cancelled. *Rejected:* one key per click, which lets a retry create a second order.
+- **C-4 Generation idempotency:** `POST /generations` requires `Idempotency-Key`, with one key per Generate click. *Rejected:* no key, which lets a network retry charge credits twice.
+- **C-5 Token refresh:** on `401` with code `token_expired`, `request()` refreshes once through `/api/auth/session`. Concurrent requests share one in-flight refresh promise. The original request is retried once, and a second failure signs the user out. *Rejected:* a timer-based refresh (breaks across sleep and tabs); forcing sign-in every 15 minutes.
+- **C-6 Response envelope:** the backend returns bare objects, and lists use `{ items, nextCursor }` (plus an optional `total`). The `{ data }` unwrap fallback in `api.ts` is removed in Step 1. *Rejected:* a `{ data }` envelope, which adds nothing over HTTP status and the error shape.
+- **C-7 Denormalised public fields:** `Listing` stores `rating`, `reviewCount`, `sampleCount` and `salesCount`; `CreatorProfile` stores `followers` and `verified`. These are updated on write. Public DTOs come from an allow-list mapper that never includes the prompt body, and a leak test covers every public route. *Rejected:* aggregating on every read (too slow for `GET /listings`); spreading documents into responses (risks leaking the body).
+- **C-8 Currency:** prices are stored as integer USD cents with `currency: "USD"`. PKR is display-only: the server returns `displayPrices.PKR`, computed from a configured rate (`PKR_PER_USD`, default 280). `ListingCardData.currency` narrows to `"USD"`. *Rejected:* storing prices in both currencies, which drift apart and complicate the ledger.
+- **C-9 Featured creators:** `GET /creators/featured` is kept and added to the plan. It returns verified creators sorted by `salesCount`, limit 6. *Rejected:* dropping it, which would change the finished home page.
+
 ## 2026-11-10 — Start the web frontend against a documented API contract
 - **Decision:** Build the Next.js web app while backend feature work proceeds independently. The frontend consumes the planned `/api/v1` routes and response shapes in [frontend-api-contract.md](frontend-api-contract.md); it does not depend on reading or changing backend implementation. Local fixture data is available only through an explicit preview flag.
 - **Reason:** Frontend and backend work can proceed in parallel without inventing opaque client-side assumptions. A written contract gives both workstreams a concrete integration target.
