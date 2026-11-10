@@ -7,7 +7,7 @@ Before any change, read docs/README.md and follow docs/WORKFLOW.md. No task is f
 @docs/DECISIONS.md
 
 ## What this is
-Shared backend (Phase 1) for the Prompt Engine mobile app, the Phase 2 Next.js web app and outside integrations. Stack: Node.js 22 LTS, TypeScript strict, Express 5, MongoDB replica set + Mongoose, Zod + OpenAPI 3.1, Redis + BullMQ, Docker, GitHub Actions. Next.js is only for the Phase 2 web app.
+Shared backend (Phase 1) for the Prompt Engine mobile app, the Phase 2 Next.js web app and outside integrations. Stack: Node.js 24 LTS, TypeScript strict, Express 5, MongoDB replica set + Mongoose, Zod + OpenAPI 3.1, Redis + BullMQ, Docker, GitHub Actions. Next.js is only for the Phase 2 web app.
 
 ## Commands (repo root)
 - Install: `npm ci`

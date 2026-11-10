@@ -4,6 +4,9 @@
   "private": true,
   "description": "One adapter per AI provider behind the AiAdapter interface",
   "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

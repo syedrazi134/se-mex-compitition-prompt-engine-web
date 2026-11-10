@@ -54,7 +54,7 @@ The API and the worker are two processes from one codebase and one Docker image.
 
 | Component | Responsibility | Technology |
 |-----------|----------------|------------|
-| `apps/api` (server) | HTTP API under `/api/v1`, auth, validation, OpenAPI docs | Node.js 22, TypeScript strict, Express 5, Zod, `zod-to-openapi` |
+| `apps/api` (server) | HTTP API under `/api/v1`, auth, validation, OpenAPI docs | Node.js 24, TypeScript strict, Express 5, Zod, `zod-to-openapi` |
 | `apps/api` (worker) | Background jobs: generation, media, payments, payouts, notifications, maintenance | BullMQ on Redis |
 | Feature modules (`apps/api/src/modules/*`) | Each owns its collections and endpoints; other modules call only its service | Mongoose models, Zod schemas, service, controller, routes |
 | `packages/shared-types` | Zod schemas and inferred types shared with web and mobile | Zod, TypeScript |

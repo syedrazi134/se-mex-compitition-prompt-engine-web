@@ -80,7 +80,7 @@ Priority: **Must** = Phase 1 backend scope. **Should** = Phase 1 if time allows.
 
 ## Constraints
 
-- Stack (decided 2026-11-10): Node.js 22 LTS, TypeScript strict, Express 5, MongoDB replica set + Mongoose, Zod + OpenAPI 3.1, Redis + BullMQ, Docker, GitHub Actions. See [DECISIONS.md](DECISIONS.md).
+- Stack (decided 2026-11-10): Node.js 24 LTS, TypeScript strict, Express 5, MongoDB replica set + Mongoose, Zod + OpenAPI 3.1, Redis + BullMQ, Docker, GitHub Actions. See [DECISIONS.md](DECISIONS.md).
 - MongoDB must run as a replica set; orders, ledger and payouts need multi-document transactions.
 - Payment gateway must work for a Pakistan-based business and support international buyers. Stripe does not onboard Pakistan-registered businesses.
 - Never store card details; hosted checkout only.

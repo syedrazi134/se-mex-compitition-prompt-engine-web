@@ -35,7 +35,7 @@ Creators on Instagram and TikTok sell prompts through DMs, link-in-bio pages and
 
 ### Prerequisites
 
-- Node.js 22 LTS (see `.nvmrc`) and npm
+- Node.js 24 LTS (see `.nvmrc`) and npm
 - Docker for local MongoDB replica set, Redis and MinIO. Optional: without it, tests and `npm run smoke` start an in-memory MongoDB replica set themselves.
 
 ### Setup

@@ -4,6 +4,9 @@
   "private": true,
   "description": "One adapter per payment gateway behind the PaymentAdapter interface",
   "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

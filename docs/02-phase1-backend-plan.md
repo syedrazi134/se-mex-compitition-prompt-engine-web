@@ -30,7 +30,7 @@ One Node.js process type serves the API; a second runs background workers from t
 
 | Layer | Choice | Why |
 | --- | --- | --- |
-| Runtime | Node.js 22 LTS, TypeScript (strict) | Shared types with web and mobile |
+| Runtime | Node.js 24 LTS, TypeScript (strict) | Shared types with web and mobile |
 | HTTP framework | Express 5 | Matches the mobile backend; async errors handled natively |
 | Database | MongoDB 7+ (Atlas, replica set) + Mongoose | Matches mobile; transactions need a replica set |
 | Validation | Zod schemas per endpoint | One schema validates input and generates OpenAPI |
