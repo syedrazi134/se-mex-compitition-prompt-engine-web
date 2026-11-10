@@ -6,11 +6,17 @@
     },
     "apps/api": {
       "entry": [
+        "src/server.ts",
         "src/worker.ts",
         "src/middleware/*.ts",
         "src/lib/*.ts",
+        "src/modules/**/*.ts",
         "src/**/*.test.ts",
         "test/**/*.ts"
+      ],
+      "ignoreDependencies": [
+        "@node-rs/argon2",
+        "@prompt-engine/oauth-providers"
       ],
       "project": ["src/**/*.ts", "test/**/*.ts"]
     },
