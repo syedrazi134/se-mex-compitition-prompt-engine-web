@@ -1,4 +1,4 @@
-export type ListingCategory = 'image' | 'video' | 'text';
+type ListingCategory = 'image' | 'video' | 'text';
 
 export interface CreatorSummary {
   id: string;
@@ -7,6 +7,16 @@ export interface CreatorSummary {
   avatarUrl: string;
   verified: boolean;
   followers?: number;
+}
+
+export interface CreatorStorefrontData {
+  creator: CreatorSummary;
+  coverImage: string;
+  bio: string;
+  socialLinks: Array<{ platform: 'Instagram' | 'TikTok' | 'YouTube'; url: string }>;
+  listings: ListingCardData[];
+  bundle: { title: string; promptCount: number; priceMinor: number; savingsPercent: number };
+  subscriptionPriceMinor: number | null;
 }
 
 export interface ListingCardData {
@@ -51,6 +61,7 @@ export interface ListingPage {
 export interface LibraryItem {
   id: string;
   listingId: string;
+  promptId: string;
   title: string;
   category: ListingCategory;
   coverImage: string;

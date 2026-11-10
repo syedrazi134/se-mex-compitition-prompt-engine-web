@@ -2,6 +2,14 @@
 
 Newest first. Entry format: date, summary, files/modules touched, verify result, follow-ups.
 
+## 2026-11-10 — Phase 2 frontend: marketplace, storefront, and creator onboarding
+
+- **Summary:** Built the responsive Next.js marketplace UI from `Prompt Engine Marketplace.pdf`, including creator storefronts and a four-step creator onboarding flow. Connected the UI to the frontend API contract without inspecting the in-progress backend. Demo mode is clearly non-submitting; following, bundles, subscriptions, uploads, and payouts remain disabled until their APIs exist. Added a configurable HTTPS media-host allow-list and corrected the listing rating keys, first-gallery image preload, and Next.js scroll warning.
+- **Files touched:** `apps/web/src/app/**`, `apps/web/src/components/**`, `apps/web/src/lib/**`, `apps/web/next.config.ts`, `apps/web/.env.example`, web/root package manifests and lockfile, `knip.json`, `README.md`, `docs/frontend-api-contract.md`, this history, and `docs/ai-usage-log.md`.
+- **Verify result:** Production web build passed; full typecheck passed; lint passed; full unit suite passed (61/61); smoke passed (API 200, in-memory MongoDB, Redis protocol stub); health passed (knip and lockfile checks clean; 10 moderate audit findings remain in ESLint tooling). `npm run verify` passed once before a clean dependency reinstall. After `npm ci`, its initial `npm ls --all` gate reports two platform-optional Sharp/WASM entries as extraneous and a missing optional `@emnapi/runtime`; the independent `verify:quick`, production web build, full test suite, smoke, and health checks all passed after the reinstall.
+- **Browser checks:** Preview storefront rendered at mobile width; follow and storefront tab interactions worked. Creator onboarding completed its preview flow without creating a profile. Listing-to-cart-to-checkout reached the explicit demo state, which confirms no payment or entitlement was created. Library, dashboard, listing draft, and sign-in error states rendered.
+- **Follow-ups:** Live backend compatibility remains unverified. Align the backend to `docs/frontend-api-contract.md`, configure `MEDIA_IMAGE_HOSTS`, then set `NEXT_PUBLIC_DEMO_MODE=false` and smoke-test authenticated flows against the live API. Revisit the npm optional-dependency install-check report and the 10 moderate development-tool audit findings.
+
 ## 2026-11-10 — Phase 1 setup, Part A: close setup follow-ups
 
 - **Summary:** Moved the runtime target from Node 22 to Node 24 LTS to match the dev machine. Made smoke report the mode of every dependency (real, in-memory or stub), so a stubbed Redis can no longer show as "ok", and made CI smoke-test against real MongoDB and Redis with `SMOKE_REQUIRE_REAL=1`. Added `docs/judge-checks.md`, which README and SUBMISSION already linked to. Pushed `phase1/setup` and opened PR #1; no feature code.

@@ -56,7 +56,7 @@ Priority: **Must** = Phase 1 backend scope. **Should** = Phase 1 if time allows.
 | FR-28 | Creator subscriptions | Stretch | Not started |
 | FR-29 | Social account connection, publish and schedule, listing share, link tracking (Phase 3) | Stretch | Not started |
 | FR-30 | Creator promo kit: reel covers, captions, short links (Phase 3) | Stretch | Not started |
-| FR-31 | Web app UI, creator storefront and dashboard, admin panel (Phase 2) | Stretch | Not started |
+| FR-31 | Web app UI, creator storefront and dashboard, admin panel (Phase 2) | Stretch | In progress: marketplace, buyer library and creator dashboard UI; admin not started |
 
 ## Non-functional requirements
 

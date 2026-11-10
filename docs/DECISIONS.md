@@ -2,6 +2,11 @@
 
 Newest first. Never undo a decision here without adding a new entry that replaces it. Format: date, decision, reason, alternatives rejected.
 
+## 2026-11-10 — Start the web frontend against a documented API contract
+- **Decision:** Build the Next.js web app while backend feature work proceeds independently. The frontend consumes the planned `/api/v1` routes and response shapes in [frontend-api-contract.md](frontend-api-contract.md); it does not depend on reading or changing backend implementation. Local fixture data is available only through an explicit preview flag.
+- **Reason:** Frontend and backend work can proceed in parallel without inventing opaque client-side assumptions. A written contract gives both workstreams a concrete integration target.
+- **Alternatives rejected:** Wait for backend routes to land before starting the UI; silently replace API failures with sample content.
+
 ## Open items (not decided)
 
 ### O-1. Linking anonymous mobile users to accounts

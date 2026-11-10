@@ -6,7 +6,6 @@
     },
     "apps/api": {
       "entry": [
-        "src/server.ts",
         "src/worker.ts",
         "src/middleware/*.ts",
         "src/lib/*.ts",

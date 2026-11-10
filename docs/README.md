@@ -14,6 +14,8 @@ Read in this order before any change. Anyone joining the team, and any AI assist
 | 8 | [testing.md](testing.md) | Test strategy, commands, edge cases, results | Writing tests; Safe Close |
 | 9 | [ai-usage-log.md](ai-usage-log.md) | AI use log required by the event rules | After any meaningful AI-assisted change |
 | 10 | [judge-checks.md](judge-checks.md) | Reviewer checklist: clone, install, verify, health, smoke, API docs | Reviewing or demoing the project |
+| 11 | [frontend-api-contract.md](frontend-api-contract.md) | API shapes and auth handoff expected by the web UI | Coordinating frontend/backend integration |
+| — | [Prompt Engine Marketplace.pdf](Prompt%20Engine%20Marketplace.pdf) | Approved Blueberry + Cream Soda web UI retheme and screen layouts | Implementing or reviewing the web frontend |
 | — | [architecture/](architecture/) | Module diagrams (added later) | As needed |
 
 Precedence when docs disagree: the Phase 1 plan overrides the context doc on stack choices; DECISIONS.md overrides both for anything logged after them.

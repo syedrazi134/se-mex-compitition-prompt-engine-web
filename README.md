@@ -56,9 +56,11 @@ See `.env.example` for the full list (names only, no values).
 
 ```sh
 npm run dev               # API on http://localhost:<PORT>/api/v1
+npm run dev:web           # Next.js web app on http://localhost:3001
 ```
 
 API docs: `/api/v1/docs`. Health: `/api/v1/health`.
+The web app reads `apps/web/.env.local`; copy `apps/web/.env.example` there. Preview mode is enabled by default in that example. Set `NEXT_PUBLIC_DEMO_MODE=false` to use the API, and allow `http://localhost:3001` in the API's CORS origins.
 
 ### Run tests
 
@@ -69,7 +71,9 @@ npm run verify            # full check: build, typecheck, lint, test, smoke
 
 ## Known limitations
 
-- Phase 1 is backend only; the web UI comes in Phase 2.
+- The web UI is an early Phase 2 slice: marketplace discovery, prompt detail, cart/hosted-checkout handoff, purchased library, creator storefront/onboarding, and creator dashboard/listing draft.
+- The web app integrates to the planned API contract in [docs/frontend-api-contract.md](docs/frontend-api-contract.md); Antigravity's backend implementation is in progress and live endpoint compatibility has not yet been verified.
+- Sample media upload, payouts, admin, social publishing and AI-provider generation are not yet connected. Demo mode is preview-only and never confirms a real order.
 - Payment gateway and AI tools are not chosen yet; fake adapters stand in.
 - The mobile app's free-prompt endpoint still runs on its own Cloudflare Worker.
 
@@ -84,6 +88,8 @@ Start with [docs/README.md](docs/README.md) for the reading order.
 - [History](docs/HISTORY.md)
 - [Requirements](docs/requirements.md)
 - [Design](docs/design.md)
+- [Frontend API contract](docs/frontend-api-contract.md)
+- [Marketplace UI design](docs/Prompt%20Engine%20Marketplace.pdf)
 - [Testing](docs/testing.md)
 - [AI usage log](docs/ai-usage-log.md)
 - [Judge checks](docs/judge-checks.md)
