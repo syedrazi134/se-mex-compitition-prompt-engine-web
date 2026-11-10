@@ -54,6 +54,4 @@ Newest first. Entry format: date, summary, files/modules touched, verify result,
   - Toolchain on this machine: Node 24.21 (plan targets 22 LTS), npm 11.19, no pnpm, no Docker.
 - **Verify result:** not applicable — no code or scripts exist yet.
 - **Follow-ups:** approve P-1, P-2, P-3 in DECISIONS.md; install Docker (or provide a MongoDB replica set + Redis) so `smoke` can pass; `docs/judge-checks.md` is linked from README and SUBMISSION but does not exist; CI must be rewritten to run `npm run verify` in Step 3.
-
-
 /////////////////////////////////////////////////////////////////////////////
