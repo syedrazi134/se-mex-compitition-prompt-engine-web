@@ -4,13 +4,17 @@ import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { silentLogger } from '../../test/helpers.js';
 import { errorHandler } from '../lib/errors.js';
-import { requireAuth } from './auth.js';
+import { ACCESS_TOKEN_AUDIENCE, ACCESS_TOKEN_ISSUER, requireAuth } from './auth.js';
 import { requireRole } from './roles.js';
 
 const SECRET = 'test-secret-that-is-at-least-32-chars!!';
 
 async function token(claims: Record<string, unknown>, secret = SECRET, expiresIn = '15m') {
-  const jwt = new SignJWT(claims).setProtectedHeader({ alg: 'HS256' }).setIssuedAt();
+  const jwt = new SignJWT(claims)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setIssuer(ACCESS_TOKEN_ISSUER)
+    .setAudience(ACCESS_TOKEN_AUDIENCE);
   if (typeof claims.sub === 'string') jwt.setSubject(claims.sub);
   return jwt.setExpirationTime(expiresIn).sign(new TextEncoder().encode(secret));
 }
@@ -40,21 +44,26 @@ describe('requireAuth', () => {
   });
 
   it('refuses missing, malformed, wrongly signed and expired tokens', async () => {
-    const cases = [
+    const unauthorizedCases = [
       undefined,
       'Bearer not-a-jwt',
       `Basic ${await token({ sub: 'u1' })}`,
       `Bearer ${await token({ sub: 'u1' }, 'another-secret-that-is-32-chars-long!')}`,
-      `Bearer ${await token({ sub: 'u1' }, SECRET, '-1s')}`,
       `Bearer ${await token({ roles: ['admin'] })}`,
       `Bearer ${await token({ sub: 'u1', roles: ['superuser'] })}`,
     ];
-    for (const header of cases) {
+    for (const header of unauthorizedCases) {
       const req = request(app()).get('/me');
       const res = await (header ? req.set('authorization', header) : req);
       expect(res.status).toBe(401);
       expect(res.body.error.code).toBe('unauthorized');
     }
+
+    const expiredRes = await request(app())
+      .get('/me')
+      .set('authorization', `Bearer ${await token({ sub: 'u1' }, SECRET, '-1s')}`);
+    expect(expiredRes.status).toBe(401);
+    expect(expiredRes.body.error.code).toBe('token_expired');
   });
 });
 

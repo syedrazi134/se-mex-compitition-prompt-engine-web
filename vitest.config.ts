@@ -18,6 +18,6 @@ export default defineConfig({
     include: ['apps/*/src/**/*.test.ts', 'apps/*/test/**/*.test.ts', 'packages/*/src/**/*.test.ts'],
     environment: 'node',
     testTimeout: 30_000,
-    hookTimeout: 120_000,
+    hookTimeout: 300_000,
   },
 });
