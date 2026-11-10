@@ -1,6 +1,8 @@
 # Runs the full verify gate (scripts/test.sh -> npm run verify) on every push and pull request.
-# Redis is a real service container. MongoDB is the in-memory replica set started by the tests
-# and by smoke, because service containers can't pass the --replSet flag mongod needs.
+# Smoke runs against REAL services: Redis as a service container, MongoDB as a single-node replica
+# set started with `docker run` (service containers can't pass the --replSet flag mongod needs).
+# SMOKE_REQUIRE_REAL=1 makes smoke fail if either one falls back to in-memory or a stub.
+# Unit and API tests still use their own in-memory replica set so they never share data.
 name: CI
 
 on:
@@ -26,14 +28,29 @@ jobs:
           --health-retries 20
     env:
       REDIS_URL: redis://localhost:6379
+      MONGODB_URI: mongodb://localhost:27017/prompt_engine_ci?replicaSet=rs0
+      SMOKE_REQUIRE_REAL: '1'
       SCARF_ANALYTICS: 'false'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version-file: .nvmrc # 24
           cache: npm
-      - name: Cache MongoDB binaries
+      - name: Start MongoDB replica set
+        run: |
+          docker run -d --name mongo -p 27017:27017 mongo:7.0.45 --replSet rs0 --bind_ip_all
+          for i in $(seq 1 30); do
+            docker exec mongo mongosh --quiet --eval "db.adminCommand('ping').ok" && break
+            sleep 2
+          done
+          docker exec mongo mongosh --quiet --eval "rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}).ok"
+          for i in $(seq 1 30); do
+            [ "$(docker exec mongo mongosh --quiet --eval 'db.hello().isWritablePrimary')" = "true" ] && exit 0
+            sleep 2
+          done
+          echo "MongoDB replica set did not become primary" && exit 1
+      - name: Cache MongoDB binaries (in-memory test server)
         uses: actions/cache@v4
         with:
           path: ~/.cache/mongodb-binaries
