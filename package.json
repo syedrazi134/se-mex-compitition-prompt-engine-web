@@ -10,13 +10,14 @@
     "packages/shared-types",
     "packages/ai-adapters",
     "packages/payment-adapters",
+    "packages/oauth-providers",
     "apps/api"
   ],
   "scripts": {
     "dev": "npm run build:packages && npm run dev -w @prompt-engine/api",
-    "build:packages": "tsc -b packages/shared-types/tsconfig.build.json packages/ai-adapters/tsconfig.build.json packages/payment-adapters/tsconfig.build.json",
+    "build:packages": "tsc -b packages/shared-types/tsconfig.build.json packages/ai-adapters/tsconfig.build.json packages/payment-adapters/tsconfig.build.json packages/oauth-providers/tsconfig.build.json",
     "build": "npm run build:packages && tsc -p apps/api/tsconfig.build.json",
-    "typecheck": "npm run build:packages && tsc -p packages/shared-types --noEmit && tsc -p packages/ai-adapters --noEmit && tsc -p packages/payment-adapters --noEmit && tsc -p apps/api --noEmit",
+    "typecheck": "npm run build:packages && tsc -p packages/shared-types --noEmit && tsc -p packages/ai-adapters --noEmit && tsc -p packages/payment-adapters --noEmit && tsc -p packages/oauth-providers --noEmit && tsc -p apps/api --noEmit",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -24,7 +25,9 @@
     "health": "node scripts/health.mjs",
     "smoke": "node scripts/smoke.mjs",
     "verify": "node scripts/verify.mjs",
-    "verify:quick": "node scripts/verify-quick.mjs"
+    "verify:quick": "node scripts/verify-quick.mjs",
+    "db:indexes": "node apps/api/dist/scripts/sync-indexes.js",
+    "purge:workspaces": "node apps/api/dist/scripts/purge-workspaces.js"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

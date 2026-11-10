@@ -11,6 +11,7 @@ export default defineConfig({
       '@prompt-engine/shared-types': pkg('shared-types'),
       '@prompt-engine/ai-adapters': pkg('ai-adapters'),
       '@prompt-engine/payment-adapters': pkg('payment-adapters'),
+      '@prompt-engine/oauth-providers': pkg('oauth-providers'),
     },
   },
   test: {
